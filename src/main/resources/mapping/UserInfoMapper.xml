@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ztace.vote.mapper.UserInfoMapper">
+
+	<!-- 返回结果集映射 注册用户 -->
+	<resultMap type="userInfo" id="userInfoMap">
+		<!-- 注册用户id -->
+		<id column="id" property="id" />
+		<!-- 用户的昵称 -->
+		<result column="nickname" property="nickname" />
+		<!-- 用户头像 -->
+		<result column="head_icon" property="headimgurl" />
+		<!-- 投票信息 -->
+		<result column="votenum" property="votenum" />
+		<!-- 上传用户自拍的地址信息 -->
+		<result column="photo" property="photo" />
+		<!-- 删除标志 -->
+		<result column="deleted" property="deleted" />
+	</resultMap>
+
+	<!-- 表名定义 -->
+	<sql id="tableName">userinfo</sql>
+
+
+	<!-- 所有列定义 -->
+	<sql id="tbAllColumns">
+		tba.id,
+		tba.head_icon,
+		tba.nickname,
+		tba.deleted,
+		tba.photo
+	</sql>
+
+	<!-- 新增列定义 -->
+	<sql id="tbInsertColumns">
+		nickname,
+		head_icon,
+		deleted,
+		photo
+	</sql>
+
+	<!-- 查询所有的注册用户信息包含统计投票 -->
+	<select id="queryAllUserInfo" resultMap="userInfoMap">
+		select * from userInfo
+		a,(select count(*) votenum,
+		c.userid uid from vote_count c group by
+		c.userid) b where a.id=b.uid
+		UNION
+		select
+		d.id,d.nickname,d.head_icon,d.deleted,d.photo,0,d.id from userinfo d where
+		not
+		EXISTS(select * from vote_count e where d.id=e.userid);
+	</select>
+	
+	<!-- 查询指定用户的详细信息 -->
+	<select id="queryUserInfoByid" parameterType="java.lang.Integer" resultMap="userInfoMap">
+		select *
+		from userinfo
+		where id=#{userid}
+	</select>
+	
+	<!--新增注册用户信息 -->
+	<insert id="insert" parameterType="userInfo" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO
+		<include refid="tableName" />
+		(
+		<include refid="tbInsertColumns" />
+		)
+		VALUES(
+		#{nickname},
+		#{headimgurl},
+		#{deleted},
+		#{photo}
+		)
+	</insert>
+	
+	<!-- 查询指定用户的详细信息包含统计投票 -->
+	<select id="queryUserInfoByUserid" parameterType="java.lang.Integer"
+		resultMap="userInfoMap">
+		SELECT
+		*
+		FROM
+			userInfo a,
+			(
+				SELECT
+					count(*) votenum,
+					userid uid
+				FROM
+					vote_count
+				WHERE
+				userid = #{userid}
+			) b
+		WHERE
+		a.id = b.uid;
+	</select>
+
+
+</mapper>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+	
+	<contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+		<resetJUL>true</resetJUL>
+	</contextListener>
+
+	<!-- To enable JMX Management -->
+	<jmxConfigurator />
+
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%-5level-[%d{yyyy-MM-dd HH:mm:ss.SSS}]-[%logger{0}] - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<!--<logger name="org.hibernate" level="debug"/> -->
+	<!-- Uncomment and add your logger here: 
+	<logger name="org.springframework.samples.service.service" level="debug"/> -->
+	<!-- MyBatis 日志配置 -->
+   <logger name="org.apache.ibatis" level="DEBUG" additivity="true">
+        <appender-ref ref="console"/>
+    </logger>
+ <!--     <logger name="java.sql.PreparedStatement" level="DEBUG" additivity="false">
+        <appender-ref ref="console"/>
+    </logger>
+    org.apache.ibatis.logging.jdbc.StatementLogger
+    <logger name="java.sql.Statement" level="DEBUG" additivity="false">
+        <appender-ref ref="console"/>
+    </logger> -->
+	<logger name="org.apache.ibatis.logging.slf4j" level="DEBUG">
+        <appender-ref ref="console"/>
+    </logger>
+    <logger name="com.ztace.sickness.mapper" level="DEBUG"/>
+
+	<root level="debug">
+		<appender-ref ref="console" />
+	</root>
+</configuration>

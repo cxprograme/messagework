@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ztace.vote.mapper.VoteMapper">
+
+    <!-- 返回结果集映射 所有用户 -->
+    <resultMap type="voteInfo" id="voteInfoMap">
+        <!-- 所有用户id -->
+        <id column="id" property="id"/>
+        <!-- 用户的openid-->
+        <result column="openid" property="openid"/>
+        <!-- 用户的昵称-->
+        <result column="nickname" property="nickname"/>
+        <!-- 用户所属国家 -->
+        <result column="country" property="country"/>
+        <!-- 用户头像 -->
+        <result column="head_icon" property="headimgurl"/>
+        <!-- 删除标志 -->
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <!-- 表名定义 -->
+    <sql id="tableName">vote_detail</sql>
+
+    <!-- 年度执法计划 所有列定义 -->
+    <sql id="tbAllColumns">
+		tba.id,
+		tba.openid,
+		tba.nickname,
+		tbb.country,
+		tba.head_icon,
+		tba.deleted
+	</sql>
+
+    <!--  新增列定义 -->
+    <sql id="tbInsertColumns">
+		openid,
+		nickname,
+		country,
+		head_icon,
+		deleted
+	</sql>
+
+    <!-- 新增 -->
+    <insert id="insert" parameterType="yearPlan" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO
+        <include refid="tableName"/>
+        (
+        <include refid="tbInsertColumns"/>
+        )
+        VALUES(
+        #{openid},
+        #{nickname},
+        #{country},
+        #{headimgurl},
+        0
+        )
+    </insert>
+
+    <!-- 批量新增 年度执法计划-->
+<!--     <insert id="insertBatch" parameterType="list">
+        INSERT INTO
+        <include refid="tableName"/>
+        (
+        <include refid="tbInsertColumns"/>
+        )
+        VALUES
+        <foreach item="item" index="index" collection="list" separator=",">
+            (
+            #{item.year},
+            #{item.groupId},
+            #{item.yearTotal},
+            #{item.importantTotal},
+            #{item.normalTotal},
+            #{item.memberNum},
+            #{item.checkPercent},
+            sysdate(),
+            #{item.modifyDate},
+            0
+            )
+        </foreach>
+    </insert>
+
+    修改 年度执法计划
+    <update id="update" parameterType="yearPlan">
+        UPDATE
+        <include refid="tableName"/>
+        <set>
+            <if test="year != null ">year = #{year},</if>
+            <if test="groupId != null">group_id = #{groupId},</if>
+            <if test="yearTotal != null">year_total = #{yearTotal},</if>
+            <if test="importantTotal != null">important_total = #{importantTotal},</if>
+            <if test="normalTotal != null">normal_total = #{normalTotal},</if>
+            <if test="memberNum != null">member_num = #{memberNum},</if>
+            <if test="checkPercent != null">check_percent = #{checkPercent},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+            <if test="modifyDate != null">modify_date = #{modifyDate},</if>
+            <if test="deleted != null">deleted = #{deleted}</if>
+        </set>
+        WHERE
+        id = #{id}
+    </update>
+
+    删除 年度执法计划
+    <delete id="delete" parameterType="int">
+        UPDATE
+        <include refid="tableName"/>
+        SET deleted = 1
+        WHERE
+        id = #{id}
+    </delete>
+
+
+    批量删除 年度执法计划
+    <delete id="deleteByIds" parameterType="list">
+        UPDATE
+        <include refid="tableName"/>
+        SET deleted = 1
+        WHERE
+        id IN
+        <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+
+    查询指定年度执法计划
+    <select id="queryByYearPlanId" parameterType="Integer" resultMap="yearPlanMap">
+        SELECT
+        <include refid="tbAllColumns"/>
+        FROM
+        <include refid="tableName"/>
+        tba
+        LEFT JOIN power_group tbb ON tbb.group_id = tba.group_id
+        WHERE tba.id = #{id}
+    </select>
+
+    查询所有年度执法计划
+    <select id="queryAllYearPlan" resultMap="yearPlanMap">
+        SELECT
+        <include refid="tbAllColumns"/>
+        FROM
+        <include refid="tableName"/>
+        tba
+        LEFT JOIN power_group tbb ON tbb.group_id = tba.group_id
+        WHERE tba.daleted = 0
+    </select>
+
+    查询指定管理机构的年度执法计划
+    <select id="queryByGroupId" parameterType="int" resultMap="yearPlanMap">
+        SELECT
+        <include refid="tbAllColumns"/>
+        FROM
+        <include refid="tableName"/>
+        tba
+        LEFT JOIN power_group tbb ON tbb.group_id = tba.group_id
+        WHERE tba.deleted = 0 AND tba.group_id = #{groupId}
+    </select> -->
+
+    <!-- 多条件 查询年度执法计划 -->
+<!--     <select id="queryByCnd" resultMap="yearPlanMap">
+        SELECT
+        <include refid="tbAllColumns"/>
+        FROM
+        <include refid="tableName"/>
+        tba
+        LEFT JOIN power_group tbb ON tbb.group_id = tba.group_id
+        WHERE tba.deleted = 0
+        <if test="id != null">AND tba.id = #{id}</if>
+        <if test="year != null">AND tba.year = #{year}</if>
+        <if test="yearTotal != null">AND tba.year_total = #{yearTotal}</if>
+        <if test="importantTotal != null">AND tba.important_total = #{importantTotal}</if>
+        <if test="normalTotal != null">AND tba.normal_total = #{normalTotal}</if>
+        <if test="memberNum != null">AND tba.member_num = #{memberNum}</if>
+        <if test="checkPercent != null">AND tba.check_percent = #{checkPercent}</if>
+        <if test="createDate != null">AND tba.create_date = #{createDate}</if>
+        <if test="modifyDate != null">AND tba.modify_date = #{modifyDate}</if>
+        <if test="deleted != null">AND tba.deleted = #{deleted}</if>
+        <if test="groupId != null">
+            AND tba.group_id IN (SELECT tbc.group_id
+            FROM power_group tbc LEFT JOIN power_group tbd ON tbd.group_id = tbc.group_id AND tbd.group_id = #{groupId}
+            WHERE tbc.group_level LIKE concat((SELECT group_level FROM power_group WHERE group_id =
+            #{groupId}),#{groupId}, '_%') AND tbc.deleted = 0 OR tbc.group_id = #{groupId} )
+        </if>
+    </select> -->
+
+</mapper>

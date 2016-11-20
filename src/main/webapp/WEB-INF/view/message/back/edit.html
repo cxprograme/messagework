@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>新增页面</title>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="stylesheet" href="static/plugins/datatable/bootstrap.min.css">
+ <link rel="stylesheet" href="static/plugins/datatable/bootstrap-table.min.css">
+  <link rel="stylesheet" href="static/plugins/datatable/bootstrap-table.min.css">
+
+</head>
+<body>
+<div class="container">
+		<form class="form-horizontal" id="info-form" method="post">
+			<input type="hidden" name="id" value="${message.id}">
+			<div class="form-group">
+				<label class="col-sm-2 control-label text-right">指令名称</label>
+				<div class="col-sm-4">
+					<input type="text" id="command" name="command" class="form-control" valid="r" validTitle="指令名称为必填信息" validInfoArea="gene_name_info_area" value="${message.command}"/>
+				</div>
+				<div class="col-sm-6"><p class="help-block" id="gene_name_info_area"></p></div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label text-right">指令描述</label>
+				<div class="col-sm-10">
+					<textarea id="description" name="description" class="form-control" rows="2">${message.description}</textarea>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label text-right">指令内容</label>
+				<div class="col-sm-10">
+					<textarea id="content" name="content" class="form-control" rows="6">${message.content}</textarea>
+				</div>
+			</div>
+		
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+					<button type="button" class="save-btn btn btn-primary">
+						<i class="fa fa-save"></i> 提交
+					</button>
+				</div>
+			</div>
+		</form>
+</div>
+<script src="/messagework/static/js/common/jquery-1.8.0.min.js"></script>
+<script src="static/plugins/datatable/bootstrap.min.js"></script>
+
+<script>
+
+$(function(){
+	$(".save-btn").on("click",function(){
+		$.post('/messagework/usave',$('#info-form').serialize(),function(data){
+			if(data.ok){
+				parent.layer.msg(data.msg,{icon:1,time:2000,shade: [0.8, '#393D49']}, function(){
+					parent.$table.bootstrapTable('refresh');
+					parent.layer.close(parent.layer.getFrameIndex(window.name)); //关闭弹窗
+			
+				});
+			}
+			else{
+				parent.layer.msg(data.msg,{icon: 0,time:1500,shade: [0.8, '#393D49']});
+			}
+				
+		});
+	});
+});
+</script>
+</body>
+</html>

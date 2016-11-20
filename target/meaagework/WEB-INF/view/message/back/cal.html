@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8' />
+
+  <script type="text/javascript" src="./static/js/common/jquery-2.2.4.min.js"></script>
+
+
+
+  <!-- Add fancyBox main JS and CSS files -->
+  <link rel="stylesheet" type="text/css" href="./static/css/jquery.fancybox.css"/>
+
+
+
+  <link href='./static/css/fullcalendar.css' rel='stylesheet' />
+
+
+  <script src='./static/js/common/moment.min.js'></script>
+  <script src='./static/js/cal/fullcalendar.min.js'></script>
+
+  <script type="text/javascript" src="./static/js/common/jquery.fancybox.js"></script>
+
+
+  <title>日历插件</title>
+  <script>
+
+    $(document).ready(function() {
+      var currentTimezone = false;
+
+
+
+      // when the timezone selector changes, rerender the calendar
+      $('#timezone-selector').on('change', function() {
+        currentTimezone = this.value || false;
+        $('#calendar').fullCalendar('destroy');
+        renderCalendar();
+      });
+
+      function renderCalendar() {
+        $('#calendar').fullCalendar({
+          header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+          },
+          defaultDate: '2016-05-12',
+          timezone: currentTimezone,
+          editable: true,
+          selectable: true,
+          eventLimit: true, // allow "more" link when too many events
+          events: {
+				
+          },
+          loading: function(bool) {
+            $('#loading').toggle(bool);
+          },
+          dayClick: function() {
+
+//            e.preventDefault();
+
+            $.fancybox({
+              width: 400,
+              height: 400,
+              autoSize: false,
+              href: 'messagework/info',
+              type: 'ajax'
+            });
+          },
+          select: function(startDate, endDate) {
+
+          }
+        });
+      }
+
+      renderCalendar();
+    });
+
+  </script>
+  <style>
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+      font-size: 14px;
+    }
+
+    #top {
+      background: #eee;
+      border-bottom: 1px solid #ddd;
+      padding: 0 10px;
+      line-height: 40px;
+      font-size: 12px;
+    }
+    .left { float: left }
+    .right { float: right }
+    .clear { clear: both }
+
+    #script-warning, #loading { display: none }
+    #script-warning { font-weight: bold; color: red }
+
+    #calendar {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 10px;
+    }
+
+    .tzo {
+      color: #000;
+    }
+
+  </style>
+</head>
+<body>
+
+
+<div id='calendar'></div>
+
+</body>
+</html>
+

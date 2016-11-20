@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
+	<title>投票报名</title>
+	<link rel="stylesheet" type="text/css" href="../static/css/vote/style.css">
+	<link rel="stylesheet" href="http://at.alicdn.com/t/font_1463034211_5239234.css">
+	<style type="text/css">
+		#img{
+			width:500px;height:300px;
+			    border-radius: 30px;
+		}
+		.imgbox {
+			width: 500px;
+			height: 300px;
+			position: relative;
+			margin:0 auto;
+			border:none;
+		} 
+		
+	   .con{
+			width: 100%;
+			height: 300px;
+			background-color: rgba(187,208,206, 0.5);
+			position: absolute;
+			left: 0px;
+			top: 0px;
+			text-align: center;
+			    border-radius: 30px;
+		} 
+		.fz48 {
+				font-size: 60px;
+				color: #5C9EB3;
+			}
+			.upbtn{
+				position: absolute;
+			    left: 50%;
+			    top: 50%;
+			    /* margin-left: -25px; */
+			    transform: translate(-50%,-50%);
+			
+			}
+			.rebtn{
+				cursor:pointer;
+				}
+			.rebtn:active{
+				background-color:#2f556f;
+			}
+	</style>
+</head>
+<body>
+	<div class="content">
+	
+		<input type="file" id="file" class="hidden" name="file" accept="image/jpeg,image/png,image/gif,audio/mp3" onchange="uploadFile()">
+		<div class="register_header">
+			<div class="title tada">
+				<img src="../static/images/vote/title.png" alt="">
+			</div>	
+		</div>
+		<div class="register_item">
+			<div class="reitems">
+				<p class="refont">用户名:</p>
+				<input type="text" class="reinput username" placeholder="请填写用户昵称">
+			</div>
+			<div class="reitems">
+				<p class="refont">用户头像:</p>
+				<input type="text" class="reinput headicon initial_password" placeholder="输入用户头像路径">
+			</div>
+			<div class="reitems">
+				<p class="refont">自拍头像:</p>
+				<div class="imgbox">
+				<img src="../static/idnf.jpg" width="960px" height="324px" alt=""  data-img="" id="img" data-dir="">
+				<!-- <input type="text" class="reinput password confirm_password" placeholder="数字或字母不超过10个长度" maxlength="10"> -->
+				
+				<div class="con">
+						<a class="upbtn" href="jaavascript:void(0);" onclick="openBrowse(this,'#img')"><i class="iconfont icon-upload fz48"></i></a>
+				</div>
+				
+				</div>
+			</div>
+		<!-- 	<div class="reitems">
+				<p class="refont">手机号码:</p>
+				<input type="text" class="reinput mobile" placeholder="请填写正确格式的手机号码">
+			</div> -->
+			<div class="rebtn" onclick="cx_upload.saveUser()">
+				提交
+			</div>
+		</div>
+		
+	</div>
+</body>
+<script src="../static/js/common/jquery-1.11.3.min.js"></script>
+<script src="../static/js/vote/cx_upload.js"></script>
+<script type="text/javascript">
+		var cx_upload={
+				init:function(){
+					$("img").on("error",function(){
+						$(this).attr("src","../static/images/vote/noimage.gif");	
+					})
+				},
+				
+				saveUser:function(){
+					var username=$(".username").val();
+					var headicon=$(".headicon").val();
+					var photo=$("#img").data("img");
+					
+					var params={
+							nickname:username,
+							headimgurl:headicon,
+							photo:photo
+					}
+					
+					alert(JSON.stringify(params));
+					var method="saveUser";
+					$.ajax({
+						type:'post',
+						url:"/admin/"+method,
+						data:params,
+						success:function(data){
+							alert(data.msg);
+						}
+					});
+					
+				}
+		}
+		cx_upload.init();
+		
+		function tz_uploadsuccess(to,jdata){
+			$("#img").data("img",jdata.url).attr("src","/"+jdata.url);
+		}
+</script>
+</html>

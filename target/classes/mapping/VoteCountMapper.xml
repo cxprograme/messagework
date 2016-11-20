@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ztace.vote.mapper.VoteCountMapper">
+
+	<!-- 返回结果集映射 所有用户 -->
+	<resultMap type="voteCount" id="voteCountMap">
+		<!-- 所有用户id -->
+		<id column="userid" property="userid" />
+		<!-- 用户的openid -->
+		<result column="openid" property="openid" />
+	</resultMap>
+
+
+	<!-- 表名定义 -->
+	<sql id="tableName">vote_count</sql>
+
+
+	<!-- 年度执法计划 所有列定义 -->
+	<sql id="tbAllColumns">
+		openid,
+		userid
+	</sql>
+
+	<!-- 新增列定义 -->
+	<sql id="tbInsertColumns">
+		openid,
+		userid
+	</sql>
+
+	<!-- 新增 -->
+	<insert id="insert" parameterType="voteCount">
+		INSERT INTO
+		<include refid="tableName" />
+		(
+		<include refid="tbInsertColumns" />
+		)
+		VALUES(
+		#{openid},
+		#{userid}
+		)
+	</insert>
+
+	<!-- 查询指定的用户id和投票人openid -->
+	<select id="queryByopenidAnduserid" parameterType="voteCount"
+		resultMap="voteCountMap">
+		SELECT
+		<include refid="tbAllColumns" />
+		FROM
+		<include refid="tableName" />
+		where userid=#{userid} and openid=#{openid}
+	</select>
+
+	<!-- 查询指定用户的数量 -->
+	<select id="countVoteByUserId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+		select 
+			count(userid) 
+		from
+		<include refid="tableName" />
+		where userid=#{userid}
+	</select>
+</mapper>

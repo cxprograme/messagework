@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>内容管理页面</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/plugins/datatable/bootstrap.min.css">
+    <link rel="stylesheet" href="static/plugins/datatable/bootstrap-table.min.css">
+</head>
+<body>
+<div class="container">
+	<div class="row">
+		当前位置：内容列表
+	</div>
+	<!-- START 操作按钮 -->
+				<div id="toolbar" class="btn-group" style="margin-bottom:5px;">
+				  <button type="button" class="add-btn btn btn-sm btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增</button>
+				  <button type="button" class="del-btn btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>删除</button>
+				  <button type="button" class="imp-btn btn btn-sm btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>导入</button>
+				  
+				  <button type="button" class="ser-btn btn btn-sm btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>查询</button>
+				</div>
+	<!-- END 操作按钮 -->
+	
+	
+    <table id="table"
+             data-toolbar="#toolbar"
+			 data-side-pagination="server"
+			 data-pagination="true"
+			 data-resizable="true"
+             data-show-columns="true"
+       		 data-show-toggle="true"
+			 data-side-pagination="server"
+			 data-url="/messagework/findall"
+			 data-page-size="15">
+    
+  
+    </table>
+</div>
+<script src="static/js/common/jquery-1.11.3.min.js"></script>
+<script src="static/plugins/datatable/bootstrap.min.js"></script>
+
+<!-- layer -->
+	<script type="text/javascript" src="static/plugins/layer/layer.js"></script>
+	<script type="text/javascript" src="static/plugins/layer/layer.config.js"></script>
+
+<!--<script src="assets/bootstrap2.3/js/bootstrap.min.js"></script>-->
+<script src="static/plugins/datatable/tableExport.js"></script>
+<script src="static/js/common/jquery.base64.js"></script>
+<script src="static/plugins/datatable/bootstrap-table.js"></script>
+<script src="static/plugins/datatable/bootstrap-table-export.js"></script>
+<script>
+var $table = $('#table'),selections=[];
+    $(function () {
+        $table.bootstrapTable('destroy').bootstrapTable({
+        	height:getHeight(),
+          columns: [
+                 {
+                     field: 'state',
+                     checkbox: true,
+                     align: 'center',
+                     valign: 'middle'
+                 }, {
+                     title: '消息编号',
+                     field: 'id',
+                     width: 50,
+                     align: 'center',
+                     valign: 'middle',
+                     sortable: true
+                 }, {
+                     title: '指令',
+                     field: 'command',
+                     align: 'left',
+                     valign: 'middle',
+                     sortable: true
+                 },
+                 {
+                     title: '描述',
+                     field: 'description',
+                     align: 'left',
+                     valign: 'middle',
+                     sortable: true
+                 },
+                 {
+                     title: '内容',
+                     field: 'content',
+                     align: 'left',
+                     valign: 'middle',
+                     sortable: true
+                 },
+                 {
+                     field: 'operate',
+                     title: '操作',
+                     width: 200,
+                     align: 'center',
+                     valign: 'middle',
+                     formatter: optFormatter
+                 }
+         ],
+         onLoadSuccess:function(){
+        	 //表格内的编辑
+        	 $(".edit-mes-btn").on("click",function(){
+        		 var messageid=$(this).attr("data-val");
+        		 layer.open({
+        			 title:'修改消息',
+        			 type:2,
+        		 	 area:['600px','600px'],
+        		 	 content:['/messagework/editpage?id='+messageid,'no']
+        		 });
+        	 });
+        	 
+        	 //表格内的删除
+        	 $('.del-mes-btn').on("click",function(){
+        		 $.post('/messagework/delete',{mid:$(this).attr('data-val')},function(data){
+        			 if(data.ok){
+        				 parent.layer.msg(data.msg,{icon:1,time:2000,shade: [0.8, '#393D49']}, function(){
+        						parent.$table.bootstrapTable('refresh');
+        						parent.layer.close(parent.layer.getFrameIndex(window.name)); //关闭弹窗
+        				
+        					});
+        			 }
+        			 else{
+        				 parent.layer.msg(data.msg,{icon: 0,time:1500,shade: [0.8, '#393D49']});
+        			 }
+        		 });
+        	 });
+         }
+        });
+        
+       //END表格配置
+      //添加消息
+        $('.add-btn').on("click",function(){
+        	layer.open({
+        		title:'添加消息',
+        		type:2,
+        		area:['600px','600px'],
+        		content:['/messagework/add','no']
+        	});
+        });
+		
+       //删除信息
+       $('.del-btn').on("click",function(){
+    	  var selDatas=$table.bootstrapTable('getSelections');
+    	  if(selDatas.length==0){
+    		  layer.msg('请选择要删除的信息',{icon: 0,shade: [0.8, '#393D49'],time: 2000});
+    	  }else{
+    		  var mids=[];
+    		  $.each(selDatas,function(i,d){
+    			  mids.push(d.id);
+    		  });
+    		  mids=mids.join(',');
+    	   $.post('/messagework/deletebatch',{mids:mids},function(data){
+    		   if( data.ok ){
+					layer.msg(data.msg,{icon: 1,time: 2000},function(){
+						//刷新页面
+						$table.bootstrapTable('refresh');
+					});
+				}else{
+					layer.msg(data.msg,{icon: 0,time: 2000});
+				}
+    	   });
+     }
+       });
+       
+       
+       //导入数据
+       $('.imp-btn').on('click',function(){
+    	   layer.open({
+    		   title:'导入数据',
+    		   type:2,
+    		   area:['600px','600px'],
+    		   content:['/messagework/importpage']
+    	   });
+       });
+          //表格高度自适应
+        	$(window).resize(function () {
+                $table.bootstrapTable('resetView', {
+                    height: getHeight()
+                });
+            });
+    });
+    
+    
+    $(".ser-btn").on("click",function(){
+    	$.ajax({
+    		type:'post',
+    		url:'/messagework/listUser',
+    		success:function(data){
+    			if( data.ok ){
+					layer.msg(data.msg,{icon: 1,time: 2000},function(){
+						//刷新页面
+						$table.bootstrapTable('refresh');
+					});
+				}else{
+					layer.msg(data.msg,{icon: 0,time: 2000});
+				}
+    		}
+    	})
+    })
+
+
+  //表格高度计算
+    function getHeight() {
+        return $(window).height() - $('.btn-group').outerHeight(true) - $('.breadcrumb').outerHeight(true) - 100;
+    }
+	//操作菜单
+    function optFormatter(value,row){
+    	var content = '<button class="edit-mes-btn btn btn-xs btn-info" data-val="'+row.id+'"><i class="fa fa-edit"></i>  编辑</button>';
+    	content += '&nbsp;<button class="del-mes-btn btn btn-xs btn-danger" data-val="'+row.id+'"><i class="fa fa-times"></i>  删除</button>';
+		return content;
+    }
+</script>
+</body>
+</html>

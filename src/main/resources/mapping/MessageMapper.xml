@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ztace.message.mapper.MessageMapper">
+
+	<!--返回结果集 消息 -->
+
+	<resultMap type="message" id="messageMap">
+		<!--消息编号 -->
+		<result column="id" property="id" />
+		<!--指令 -->
+		<result column="command" property="command" />
+		<!--描述 -->
+		<result column="description" property="description" />
+		<!--内容 -->
+		<result column="content" property="content" />
+	</resultMap>
+
+	<resultMap type="message" id="messageAndUserMap">
+		<!--消息编号 -->
+		<result column="id" property="id" />
+		<!--指令 -->
+		<result column="command" property="command" />
+		<!--描述 -->
+		<result column="description" property="description" />
+		<!--内容 -->
+		<result column="content" property="content" />
+		<!-- 用户信息 -->
+		<association property="user" column="user_id" javaType="user">
+			<result property="username" column="username" />
+			<result property="sex" column="sex" />
+		</association>
+	</resultMap>
+
+	<!--消息列表 表名定义 -->
+	<sql id="tableName">mes_info</sql>
+
+	<!-- 消息 所有列定义 -->
+	<sql id="tbAllColumns">
+		id,
+		command,
+		description,
+		content
+	</sql>
+
+	<!--消息信息 新增列定义 -->
+	<sql id="tbInsertColumns">
+		command,
+		description,
+		content
+	</sql>
+
+
+	<!--新增指令信息 -->
+	<insert id="insert" parameterType="message" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO
+		<include refid="tableName" />
+		(
+		<include refid="tbInsertColumns" />
+		)
+		VALUES(
+		#{command},
+		#{description},
+		#{content}
+		)
+	</insert>
+
+	<!--批量新增数据 -->
+	<insert id="insertBatch" parameterType="list">
+		INSERT INTO
+		<include refid="tableName" />
+		(
+		<include refid="tbInsertColumns"></include>
+		)
+		VALUES
+		<foreach item="item" index="index" collection="list"
+			separator=",">
+			(#{item.command},
+			#{item.description},
+			#{item.content}
+			)
+		</foreach>
+	</insert>
+
+	<!--修改消息信息 -->
+	<update id="update" parameterType="message">
+		UPDATE
+		<include refid="tableName" />
+		SET
+		command=#{command},
+		description=#{description},
+		content=#{content}
+		WHERE
+		id=#{id}
+	</update>
+
+	<!--批量删除消息信息 -->
+	<delete id="deleteBatch" parameterType="list">
+		DELETE FROM
+		<include refid="tableName" />
+		WHERE
+		id IN
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<!--删除单条消息信息 -->
+	<delete id="delete" parameterType="int">
+		DELETE FROM
+		<include refid="tableName" />
+		WHERE id=#{mid}
+	</delete>
+
+	<!--查询指定编号的消息 -->
+	<select id="queryMessageById" resultMap="messageMap">
+		SELECT
+		<include refid="tbAllColumns" />
+		FROM
+		<include refid="tableName" />
+		where id=#{mid}
+	</select>
+
+	<!-- 查询所有基因基本信息 -->
+	<select id="queryAllMessages" resultMap="messageMap">
+		SELECT
+		<include refid="tbAllColumns" />
+		FROM
+		<include refid="tableName" />
+	</select>
+
+	<select id="queryMesAndUser" resultMap="messageAndUserMap">
+		SELECT
+		m.id as id,
+		m.content as comment,
+		m.command as command,
+		m.description as description,
+		u.username as username,
+		u.sex as sex
+		FROM
+		mes_info as m
+		LEFT JOIN
+		user_info as u
+		ON m.user_id=u.id
+	</select>
+</mapper>

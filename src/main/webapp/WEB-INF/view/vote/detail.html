@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
+	<title>个人主页</title>
+	<link rel="stylesheet" type="text/css"
+	href="../static/css/vote/style.css">
+<link rel="stylesheet" type="text/css"
+	href="../static/css/vote/dropload.css">
+</head>
+<body data-userid=${userInfo.id}>
+	<div class="content">
+		<div class="register_header" style="height: 200px;">
+			<div class="personal">
+				<div class="pl">
+					<div class="head">
+						<img src="${userInfo.headimgurl}" alt="">
+					</div>
+					<div class="p_descr">
+						<p>${userInfo.nickname}</p>
+						<p>编号#${userInfo.id}</p>
+					</div>
+				</div>
+				<div class="pr">
+					<div class="p_descr pr_descr">
+						<!-- <p>1名</p> -->
+						<p>${userInfo.votenum}票</p>
+					</div>
+				</div>
+				<div class="motto">
+					谁能比我美？谁能比我美？
+				</div>
+			</div>
+			<div class="home register">
+				<a href="/vote/index">
+					活动首页
+				</a>
+			</div>
+		</div>
+		<div class="register_content">
+			<div class="vfriend">
+				<div>
+					<span class="line"></span>
+					<span class="dot"></span>
+				</div>
+				<div>
+					已投票的好友
+				</div>
+				<div>
+					<span class="dot"></span>
+					<span class="line"></span>
+				</div>
+			</div>
+			<ul class="vflist coming">
+			<% for(voteInfo in voteInfos) {%>
+				<li>
+				    <div class="head">
+				        <a href="#"><img src="${voteInfo.headimgurl}" alt=""></a>
+				    </div>
+				    <div class="up">
+				    	<div class="vote">
+				    		<span>投了一票</span>
+				    	</div>
+				    </div>
+				    <div class="descr">
+				        <h3>${voteInfo.nickname}</h3>
+				        <p>编号#20</p>
+				    </div>
+				</li>		
+				<%}%>	
+			</ul>
+		</div>
+	</div>
+</body>
+<script src="../static/js/common/jquery-1.11.3.min.js"></script>
+<script src="../static/js/vote/dropload.js"></script>
+<!-- <script src="/javascripts/vote.js"></script> -->
+<script type="text/javascript">
+		/* $(function(){
+			var userid=$("body").data("userid");
+			alert(userid);
+		}) */
+</script>
+</html>
