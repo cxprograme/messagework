@@ -47,7 +47,7 @@
 		c.userid) b where a.id=b.uid
 		UNION
 		select
-		d.id,d.nickname,d.head_icon,d.deleted,d.photo,0,d.id from userinfo d where
+		d.id,d.nickname,d.head_icon,d.deleted,d.photo,d.issue,0,d.id from userinfo d where
 		not
 		EXISTS(select * from vote_count e where d.id=e.userid);
 	</select>

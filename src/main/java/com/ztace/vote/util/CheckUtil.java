@@ -3,6 +3,10 @@ package com.ztace.vote.util;
 import java.security.MessageDigest;
 import java.util.Arrays;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Value;
+
 
 /**
  * 校验类
@@ -10,8 +14,11 @@ import java.util.Arrays;
  *
  */
 public class CheckUtil {
-	private static final String token="ujs";
+	private static final transient Log log = LogFactory.getLog(CheckUtil.class);
+	private static  String token;
 	public static boolean check(String signature,String timestamp,String nonce){
+		token=AppInfoUtil.getToken();
+		log.debug("token:"+token);
 		String arr[]=new String[]{token,timestamp,nonce};
 		//对三个参数进行排序
 		Arrays.sort(arr);

@@ -122,7 +122,7 @@
 							if(data.ok){
 							parent.layer.msg(data.msg,{icon:1,time:2000,shade: [0.8, '#393D49']}, function(){
 								parent.layer.close(parent.layer.getFrameIndex(window.name)); //关闭弹窗
-								
+								parent.location.reload();
 							});
 								
 							}

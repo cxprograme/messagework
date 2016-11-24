@@ -3,6 +3,8 @@ package com.ztace.vote.util;
 import java.io.IOException;
 import java.net.URLEncoder;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -13,6 +15,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.ztace.vote.entity.AccessToken;
 import com.ztace.vote.entity.EncodeTicket;
@@ -23,15 +26,18 @@ import net.sf.json.JSONObject;
 
 @SuppressWarnings("deprecation")
 public class WeChatUtil {
-	private static final String APPID = "wx00d6ab0d5f9b2325";
-	private static final String APPSECRET = "d4624c36b6795d1d99dcf0547af5443d";
 	
+	//private static final String APPID = "wx00d6ab0d5f9b2325";
+	//private static final String APPSECRET = "d4624c36b6795d1d99dcf0547af5443d";
+	private static  String APPID;
+	
+	private static  String APPSECRET;
 	
 	private static final String APPLICATION_JSON = "application/json";
     
     private static final String CONTENT_TYPE_TEXT_JSON = "text/json";
 
-
+	private static final transient Log log = LogFactory.getLog(WeChatUtil.class);
 	// 获取access_tokend的url
 	private static final String ACCESS_TOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET";
 
@@ -81,6 +87,10 @@ public class WeChatUtil {
 	 * @return
 	 */
 	public static AccessToken getAccessToken() {
+		APPID=AppInfoUtil.getAppId();
+		APPSECRET=AppInfoUtil.getAppSecret();
+		//System.err.println("appid:"+APPID+",appsecr:"+APPSECRET);
+		log.debug("appid:"+APPID+",appsecr:"+APPSECRET);
 		AccessToken accessToken = new AccessToken();
 		String url = ACCESS_TOKEN_URL.replace("APPID", APPID).replace("APPSECRET", APPSECRET);
 
@@ -168,6 +178,53 @@ public class WeChatUtil {
 		JSONObject json = doGetStr(requestUrl);
 		if (null != json) {
 			System.out.println(json);
+			if(json.containsKey("openid")){
+				voteInfo.setOpenid(json.getString("openid"));
+				
+			}
+			if(json.containsKey("nickname")){
+				voteInfo.setNickname(json.getString("nickname"));
+			}
+			if(json.containsKey("sex")){
+				voteInfo.setSex(json.getInt("sex"));
+				
+			}
+			if(json.containsKey("province")){
+				voteInfo.setProvince(json.getString("province"));
+			}
+			if(json.containsKey("city")){
+				voteInfo.setCity(json.getString("city"));
+			}
+			if(json.containsKey("country")){
+				voteInfo.setCountry(json.getString("country"));
+			}
+			if(json.containsKey("headimgurl")){
+				voteInfo.setHeadimgurl(json.getString("headimgurl"));
+			}
+			if(json.containsKey("subscribe")){
+				voteInfo.setIsfollow(json.getInt("subscribe"));
+			}
+			if(json.containsKey("sex")){
+				voteInfo.setSex(json.getInt("sex"));
+			}
+			if(json.containsKey("language")){
+				voteInfo.setLanguage(json.getString("language"));
+			}
+			if(json.containsKey("subscribe_time")){
+				voteInfo.setSubscribe_time(json.getString("subscribe_time"));
+			}
+		}
+		return voteInfo;
+	}
+
+
+	/*public static VoteInfo getOauth2UserInfo(String accessToken, String openId) {
+		
+		VoteInfo voteInfo = new VoteInfo();
+		String url = Oauth2_USER_INFO_URL.replace("ACCESS_TOKEN", accessToken).replace("OPENID", openId);
+		JSONObject json = doGetStr(url);
+		if (null != json) {
+			System.out.println("json  " + json);
 			voteInfo.setOpenid(json.getString("openid"));
 			voteInfo.setNickname(json.getString("nickname"));
 			voteInfo.setSex(json.getInt("sex"));
@@ -175,12 +232,15 @@ public class WeChatUtil {
 			voteInfo.setCity(json.getString("city"));
 			voteInfo.setCountry(json.getString("country"));
 			voteInfo.setHeadimgurl(json.getString("headimgurl"));
-			
+			voteInfo.setPrivilege(json.getString("privilege"));
 		}
+		
+		System.out.println("user: " + voteInfo);
 		return voteInfo;
-	}
-
-
+		
+	}*/
+	
+	
 	/**
 	 * 获得网页授权的access_token
 	 * 
@@ -202,38 +262,8 @@ public class WeChatUtil {
 		return wt;
 	}
 
-	public static VoteInfo getOauth2UserInfo(String accessToken, String openId) {
 
-		VoteInfo voteInfo = new VoteInfo();
-		String url = Oauth2_USER_INFO_URL.replace("ACCESS_TOKEN", accessToken).replace("OPENID", openId);
-		JSONObject json = doGetStr(url);
-		if (null != json) {
-			System.out.println("json  " + json);
-			voteInfo.setOpenid(json.getString("openid"));
-			voteInfo.setNickname(json.getString("nickname"));
-			voteInfo.setSex(json.getInt("sex"));
-			voteInfo.setProvince(json.getString("province"));
-			voteInfo.setCity(json.getString("city"));
-			voteInfo.setCountry(json.getString("country"));
-			voteInfo.setHeadimgurl(json.getString("headimgurl"));
-			voteInfo.setPrivilege(json.getString("privilege"));
-			//userInfo.setUnionid(json.getString("unionid"));
-		}
-
-		System.out.println("user: " + voteInfo);
-		return voteInfo;
-
-		/*
-		 * String result = null; String requestUrl = Oauth2_USER_INFO_URL;
-		 * requestUrl = requestUrl.replace("ACCESS_TOKEN",
-		 * accessToken).replace("OPENID", openId); JSONObject jsonObject =
-		 * doGetStr(requestUrl); if (null != jsonObject) {
-		 * System.out.println(jsonObject);
-		 * 
-		 * result = jsonObject.get("data") + ""; } return result;
-		 */
-	}
-
+	
 	public static JSONObject checkToken(String accessToken, String openId) {
 		String url = CHECK_TOKEN_URL.replace("ACCESS_TOKEN", accessToken).replace("OPENID", openId);
 		JSONObject jsonObject = doGetStr(url);

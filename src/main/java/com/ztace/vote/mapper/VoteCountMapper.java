@@ -1,7 +1,8 @@
 package com.ztace.vote.mapper;
 
+import java.util.Map;
+
 import com.ztace.vote.entity.VoteCount;
-import com.ztace.vote.entity.VoteInfo;
 
 /**
  * 
@@ -56,6 +57,17 @@ public interface VoteCountMapper {
 	 */
 	int countVoteByUserId(int userid);
 	
-	
-
+	/**
+	 * 根据期数和openid查询当前openid投了几票
+	 * (这里用一句话描述这个方法的作用)
+	 * 方法名：countVoteByopenidAndissue
+	 * 创建人：chenxu 
+	 * 时间：2016年11月24日-下午12:49:32 
+	 * 手机:
+	 * @param map
+	 * @return int
+	 * @exception 
+	 * @since  1.0.0
+	 */
+	int countVoteByopenidAndissue(Map<String,String> map);
 }

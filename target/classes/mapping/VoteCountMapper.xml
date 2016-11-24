@@ -58,4 +58,17 @@
 		<include refid="tableName" />
 		where userid=#{userid}
 	</select>
+	
+	<!-- 根据期数和openid查询数量 -->
+	<select id="countVoteByopenidAndissue" parameterType="Map" resultType="java.lang.Integer">
+		SELECT 
+			COUNT(vc.openid)
+		FROM 
+			vote_count vc
+		LEFT JOIN 
+			userinfo u
+		ON  u.id=vc.userid 
+		WHERE 
+			vc.openid=#{openid} AND u.issue=#{issue}
+	</select>
 </mapper>

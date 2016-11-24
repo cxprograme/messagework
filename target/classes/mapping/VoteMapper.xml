@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ztace.vote.mapper.VoteMapper">
 
+
 	<!-- 返回结果集映射 所有用户 -->
 	<resultMap type="voteInfo" id="voteInfoMap">
 		<!-- 所有用户id -->
@@ -10,14 +11,24 @@
 		<result column="openid" property="openid" />
 		<!-- 用户的昵称 -->
 		<result column="nickname" property="nickname" />
-		<!-- 用户所属国家 -->
-		<result column="country" property="country" />
 		<!-- 用户头像 -->
 		<result column="head_icon" property="headimgurl" />
-		<!-- 删除标志 -->
-		<result column="deleted" property="deleted" />
 		<!--是否关注 -->
 		<result column="isfollow" property="isfollow" />
+		<!-- 性别 -->
+		<result column="sex" property="sex" />
+		<!-- 语言 -->
+		<result column="language" property="language" />
+		<!-- 城市 -->
+		<result column="city" property="city" />
+		<!-- 省份 -->
+		<result column="province" property="province" />
+		<!-- 国家 -->
+		<result column="country" property="country" />
+		<!-- 关注时间 -->
+		<result column="subscribe_time" property="subscribe_time" />
+		<!-- 删除标志 -->
+		<result column="deleted" property="deleted" />
 	</resultMap>
 
 
@@ -30,20 +41,30 @@
 		tba.id,
 		tba.openid,
 		tba.nickname,
-		tbb.country,
 		tba.head_icon,
-		tba.deleted,
-		tba.isfollow
+		tba.isfollow,
+		tba.sex,
+		tba.language,
+		tba.city,
+		tba.province,
+		tba.country,
+		tba.subscribe_time,
+		tba.deleted
 	</sql>
 
 	<!-- 新增列定义 -->
 	<sql id="tbInsertColumns">
 		openid,
 		nickname,
-		country,
 		head_icon,
-		deleted,
-		isfollow
+		isfollow,
+		sex,
+		language,
+		city,
+		province,
+		country,
+		subscribe_time,
+		deleted
 	</sql>
 
 	<!-- 新增 -->
@@ -57,10 +78,15 @@
 		VALUES(
 		#{openid},
 		#{nickname},
-		#{country},
 		#{headimgurl},
-		0,
-		#{isfollow}
+		#{isfollow},
+		#{sex},
+		#{language},
+		#{city},
+		#{province},
+		#{country},
+		#{subscribe_time},
+		#{deleted}
 		)
 	</insert>
 	
@@ -75,12 +101,17 @@
 		VALUES
 		<foreach item="item" index="index" collection="list"
 			separator=",">
-			(#{item.openid},
-			#{item.nickname},
-			#{item.country},
-			#{item.headimgurl},
-			#{item.deleted},
-			#{item.isfollow}
+			(	#{item.openid},
+				#{item.nickname},
+				#{item.headimgurl},
+				#{item.isfollow},
+				#{item.sex},
+				#{item.language},
+				#{item.city},
+				#{item.province},
+				#{item.country},
+				#{item.subscribe_time},
+				#{item.deleted}
 			)
 		</foreach>
 	</insert>
@@ -92,10 +123,15 @@
 		SET
 		openid=#{openid},
 		nickname=#{nickname},
-		country=#{country},
 		head_icon=#{headimgurl},
-		deleted=#{deleted},
-		isfollow=#{isfollow}
+		isfollow=#{isfollow},
+		sex=#{sex},
+		language=#{language},
+		city=#{city},
+		province=#{province},
+		country=#{country},
+		subscribe_time=#{subscribe_time},
+		deleted=#{deleted}
 		WHERE
 		openid=#{openid}
 	</update>
@@ -103,7 +139,7 @@
 	<!-- 查询用户的所有投票人信息 -->
 	<select id="queryVoteInfoByUserid" parameterType="java.lang.Integer"
 		resultMap="voteInfoMap">
-		SELECT vd.nickname,vd.head_icon,vd.country,vd.isfollow
+		SELECT vd.openid,vd.nickname,vd.head_icon,vd.isfollow,vd.sex,vd.language,vd.city,vd.province,vd.country,vd.subscribe_time,vd.deleted
 		FROM vote_detail vd
 		LEFT JOIN vote_count vc
 		ON vd.openid=vc.openid
@@ -113,7 +149,7 @@
 	<!-- 查询投票人的信息根据openid -->
 	<select id="queryVoteInfoByOpenid" parameterType="java.lang.String"
 		resultMap="voteInfoMap">
-		SELECT vd.id,vd.openid,vd.nickname,vd.head_icon,vd.country,vd.isfollow
+		SELECT vd.id,vd.openid,vd.nickname,vd.head_icon,vd.isfollow,vd.sex,vd.language,vd.city,vd.province,vd.country,vd.subscribe_time,vd.deleted
 		FROM vote_detail vd
 		WHERE vd.openid=#{openid} and vd.deleted=0
 	</select>

@@ -7,8 +7,11 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,8 +21,11 @@ import com.ztace.vote.entity.VoteCount;
 import com.ztace.vote.entity.VoteInfo;
 import com.ztace.vote.service.VoteCountService;
 import com.ztace.vote.service.VoteService;
+import com.ztace.vote.util.AppInfoUtil;
 import com.ztace.vote.util.CheckUtil;
+import com.ztace.vote.util.MenuUtil;
 import com.ztace.vote.util.MessageUtil;
+import com.ztace.vote.util.TokenUtil;
 import com.ztace.vote.util.WeChatUtil;
 
 /**
@@ -35,12 +41,16 @@ import com.ztace.vote.util.WeChatUtil;
 @Controller
 @RequestMapping("/wc")
 public class WeChatController {
+	private static final transient Log log = LogFactory.getLog(WeChatController.class);
 	
 	@Autowired 
 	private VoteService voteService;
 	
 	@Autowired
 	private VoteCountService voteCountService;
+	
+	@Value("${menu_json}")
+	private String menujson;
 	/**
 	 * 数据传递接口
 	 * 
@@ -49,7 +59,8 @@ public class WeChatController {
 	 */
 	@RequestMapping(value="/entry",method=RequestMethod.GET)
 	public void entryWechat(HttpServletRequest request, HttpServletResponse response) {
-		System.out.println("消息传递");
+		//System.out.println("消息传递");
+		log.info("消息传递");
 		String signature = request.getParameter("signature");
 		String timestamp = request.getParameter("timestamp");
 		String nonce = request.getParameter("nonce");
@@ -101,7 +112,13 @@ public class WeChatController {
 				}
 			}else if(MessageUtil.MESSAGE_EVENT.equals(msgType)){
 				String eventType = map.get("Event");
+				//获取access_token
+	//			AccessToken accessToken=WeChatUtil.getAccessToken();
+				AccessToken accessToken=TokenUtil.accessToken;
+				String accss_token=accessToken.getAccess_token();
 				if(MessageUtil.MESSAGE_SUBSCRIBE.equals(eventType)){
+					log.info("获得的数据:"+AppInfoUtil.getMenuJson());
+					MenuUtil.createMenu(AppInfoUtil.getMenuJson(), accessToken.getAccess_token());
 					//获得发送方的openid(此处及投票人的openid)
 					String openid=map.get("FromUserName");
 					//先到vote_details中的判断用户是否关注 如果未关注，把关注状态改为1
@@ -110,16 +127,17 @@ public class WeChatController {
 						//授权进入的用户，且用户信息以保存，未改关注状态
 						if(voteInfo.getIsfollow()==0){
 							voteInfo.setIsfollow(1);
-							voteService.updateVoteInfoByOpenid(voteInfo);
+							VoteInfo voteInfo2=WeChatUtil.getUserInfoByopenid(accss_token, openid);
+							voteService.updateVoteInfoByOpenid(voteInfo2);
 						}
 					}else{
 						//该用户不存，通过关注公众号方式投票
-						AccessToken accessToken=WeChatUtil.getAccessToken();
-						
-						String accss_token=accessToken.getAccess_token();
 						VoteInfo voteInfo2=WeChatUtil.getUserInfoByopenid(accss_token, openid);
+						
 						//将用户信息保存到数据库中，并将关注状态更改为1
 						voteInfo2.setIsfollow(1);
+						
+					
 						voteService.save(voteInfo2);
 					}
 					
@@ -141,6 +159,7 @@ public class WeChatController {
 				}else if(MessageUtil.MESSAGE_UNSUBSCRIBE.equals(eventType)){
 					//取消关注触发事件
 					VoteInfo voteInfo=voteService.queryVoteInfoByOpenid(fromUserName);
+					System.err.println(voteInfo);
 					if(null!=voteInfo){
 						if(voteInfo.getIsfollow()==1){
 							voteInfo.setIsfollow(0);

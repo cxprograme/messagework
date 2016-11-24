@@ -40,7 +40,7 @@ import com.ztace.message.web.AjaxTableReturn;
  */
 @Controller
 public class MessageController {
-
+	
 	@Autowired
 	private MessageService messageService;
 

@@ -12,7 +12,7 @@
 		http://www.springframework.org/schema/tx/spring-tx.xsd">
 
 	<!--Service扫描 -->
-	<context:component-scan base-package="com.ztace.vote.service,com.ztace.message.service" />
+	<context:component-scan base-package="com.ztace.vote.service,com.ztace.message.service,com.ztace.vote.listener" />
 	
 	<!--配置文件  -->		
 	<context:property-placeholder location="classpath*:config/db.properties"/>

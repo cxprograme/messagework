@@ -1,21 +1,21 @@
 package com.ztace.vote.controller;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -30,8 +30,8 @@ import com.ztace.vote.entity.WeChatOauth2Token;
 import com.ztace.vote.service.UserInfoService;
 import com.ztace.vote.service.VoteCountService;
 import com.ztace.vote.service.VoteService;
-import com.ztace.vote.util.CheckUtil;
 import com.ztace.vote.util.ReadFileUtil;
+import com.ztace.vote.util.TokenUtil;
 import com.ztace.vote.util.WeChatUtil;
 
 import net.sf.json.JSONArray;
@@ -46,6 +46,9 @@ import net.sf.json.JSONObject;
 @Controller
 @RequestMapping("/vote")
 public class VoteController {
+	private static final transient Log log = LogFactory.getLog(VoteController.class);
+	private static final int MAX_VOTE=2;
+	
 	@Autowired
 	private VoteService voteService;
 	
@@ -62,22 +65,20 @@ public class VoteController {
 	 * 
 	 * @return
 	 */
-	//@RequestMapping("/index")
-	/*public String voteIndex(Model model,@RequestParam("code") String code,HttpServletRequest request) {
-		System.out.println("进入");
+	@RequestMapping("/index")
+	public String voteIndex(Model model,@RequestParam("code") String code,HttpServletRequest request) {
 		VoteInfo snsUserInfo=null;
 		try {
 			WeChatOauth2Token wt = WeChatUtil.getOauth2Token(code);
 			// 验证token是否过期
 			WeChatUtil.checkToken(wt.getAccessToken(), wt.getOpenId());
 			// 获取用户信息
-			snsUserInfo = WeChatUtil.getOauth2UserInfo(wt.getAccessToken(), wt.getOpenId());
+			snsUserInfo = WeChatUtil.getUserInfoByopenid(wt.getAccessToken(), wt.getOpenId());
 			
 			// 将用户openId放入session中
 			request.getSession().setAttribute("openId", snsUserInfo.getOpenid());
 			// 设置要传递的参数
 			request.setAttribute("snsUserInfo", snsUserInfo);
-			System.out.println("用户信息:" + snsUserInfo.toString());
 			VoteInfo voteInfo=voteService.queryVoteInfoByOpenid(snsUserInfo.getOpenid());
 			if(voteInfo==null){
 				// 将用户信息存入数据库
@@ -89,10 +90,9 @@ public class VoteController {
 			e.printStackTrace();
 		}
 		JSONObject json = JSONObject.fromObject(snsUserInfo);
-		System.err.println("json:"+json);
 		model.addAttribute("voteInfo", json);
 		return "/vote/index1";
-	}*/
+	}
 	
 	
 	/***
@@ -107,9 +107,9 @@ public class VoteController {
 	 * @exception 
 	 * @since  1.0.0
 	 */
-	@RequestMapping("/index")
+	/*@RequestMapping("/index")
 	public String voteIndex(Model model) {
-		System.out.println("进入");
+		log.info("进入");
 		VoteInfo voteInfo=new VoteInfo();
 		voteInfo.setOpenid("ogERLwGst34lgmhBUlAWaHHq13DY");
 		voteInfo.setNickname("cxxcx");
@@ -117,7 +117,7 @@ public class VoteController {
 		model.addAttribute("voteInfo", json);
 		return "/vote/index1";
 	}
-
+*/
 	/**
 	 * 初始化数据库
 	 * (这里用一句话描述这个方法的作用)
@@ -130,26 +130,17 @@ public class VoteController {
 	 */
 	@RequestMapping("/init")
 	public void init(){
-//		AccessToken accessToken=WeChatUtil.getAccessToken();
-		String access_token="037r9TNB8Uvv5hJD9JWgbNe9M_8vImclfqXqUYWYjQ-rIZmBCiPwipPgXRt4Ck9yj1H6c91is3qhfviaSxKoc1O5TEspMM6pzBAagUU-wktfGWzJdUpapojKpJ40zAsYVFBjAEAMWS";
-		
+		String access_token="3on4O2tggIcQ7NsE_FPYZq_9I7Ke2ruNTnQQuoQt53m1_MdmZlB1cnjeTY666pCecVj6sSgV64Pxa62Elk27vAVG70HCJj4CUOrGYKHqX-7UL7smVUfXP2HNo5cO_cK9YQHdAJAUMD";
 		String JsonContext = new ReadFileUtil().ReadFile("/Users/cx/Downloads/fans-openid.json");
 		JSONObject jsonObject=JSONObject.fromObject(JsonContext);
 		JSONObject jsonObject2=JSONObject.fromObject(jsonObject.getString("data"));
 		JSONArray jsonArray=JSONArray.fromObject(jsonObject2.getString("openid"));
 		List<VoteInfo> voteInfos=new ArrayList<>();
 		int size=jsonArray.size();
-		System.err.println(size);
-//		VoteInfo voteInfo=new VoteInfo();
-//		voteInfo.setNickname("Queeny👸🏾");
 		for(int i=0;i<size;i++)
 		{
 			String openid=jsonArray.get(i).toString();
 			VoteInfo voteInfo=WeChatUtil.getUserInfoByopenid(access_token, openid);
-//			VoteInfo voteInfo=new VoteInfo();
-//			voteInfo.setOpenid(jsonArray.get(i).toString());
-			voteInfo.setIsfollow(1);
-			
 			voteInfos.add(voteInfo);
 			}
 		System.err.println(voteInfos);
@@ -193,22 +184,33 @@ public class VoteController {
 			VoteCount voteCount=new VoteCount();
 			voteCount.setUserid(id);
 			voteCount.setOpenid(openid);
-			//查询是否已经投票			
-			VoteCount voteCount2=voteCountService.queryByopenidAnduserid(voteCount);
-			if(voteCount2==null){
-				//已经投票
-				if(voteCountService.save(voteCount)>0){
-					result.setOk(true).setMsg("Vote Success");
+			//查询当前openid总共投了多少票
+			Map<String, String> maps=new HashMap<>();
+			maps.put("issue", "1");
+			maps.put("openid", openid);
+			int num=voteCountService.countVoteByopenidAndissue(maps);
+			if(num<MAX_VOTE){
+				//查询是否已经投票			
+				VoteCount voteCount2=voteCountService.queryByopenidAnduserid(voteCount);
+				if(voteCount2==null){
+					//已经投票
+					if(voteCountService.save(voteCount)>0){
+						result.setOk(true).setMsg("Vote Success");
+					}
+				}else{
+					result.setOk(false).setMsg("Vote Exits");
 				}
+				
 			}else{
-				result.setOk(false).setMsg("Vote Exits");
+				//投票超过了2票
+				result.setOk(false).setErrCode("max").setMsg("Max");
 			}
 			
 		}else{
 			
 			//获取全局的AccessToken
-			AccessToken accessToken=WeChatUtil.getAccessToken();
-			
+			//AccessToken accessToken=WeChatUtil.getAccessToken();
+			AccessToken accessToken=TokenUtil.accessToken;
 			String accss_token=accessToken.getAccess_token();
 			
 			//创建ticket的请求参数

@@ -12,7 +12,6 @@ package com.ztace.vote.entity;
  */
 public class VoteInfo {
 	private int id;
-	private int subscribe;
 	private String openid;
 	private String nickname;
 	private int sex;
@@ -38,12 +37,7 @@ public class VoteInfo {
 	public void setDeleted(int deleted) {
 		this.deleted = deleted;
 	}
-	public int getSubscribe() {
-		return subscribe;
-	}
-	public void setSubscribe(int subscribe) {
-		this.subscribe = subscribe;
-	}
+	
 	public String getOpenid() {
 		return openid;
 	}
@@ -112,10 +106,10 @@ public class VoteInfo {
 	}
 	@Override
 	public String toString() {
-		return "VoteInfo [subscribe=" + subscribe + ", openid=" + openid + ", nickname=" + nickname + ", sex=" + sex
-				+ ", city=" + city + ", country=" + country + ", province=" + province + ", language=" + language
-				+ ", headimgurl=" + headimgurl + ", subscribe_time=" + subscribe_time + ", privilege=" + privilege
-				+ ", unionid=" + unionid + ", deleted=" + deleted + ", isfollow=" + isfollow + "]";
+		return "VoteInfo [id=" + id + ", openid=" + openid + ", nickname=" + nickname + ", sex=" + sex + ", city="
+				+ city + ", country=" + country + ", province=" + province + ", language=" + language + ", headimgurl="
+				+ headimgurl + ", subscribe_time=" + subscribe_time + ", privilege=" + privilege + ", unionid="
+				+ unionid + ", deleted=" + deleted + ", isfollow=" + isfollow + "]";
 	}
 	public int getIsfollow() {
 		return isfollow;

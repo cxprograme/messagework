@@ -1,5 +1,7 @@
 package com.ztace.vote.service.servicelmp;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +44,12 @@ public class VoteCountServicelmpl implements VoteCountService{
 	public int countVoteByUserId(int userid) {
 		// TODO Auto-generated method stub
 		return voteCountMapper.countVoteByUserId(userid);
+	}
+
+	@Override
+	public int countVoteByopenidAndissue(Map<String, String> map) {
+		// TODO Auto-generated method stub
+		return voteCountMapper.countVoteByopenidAndissue(map);
 	}
 
 }

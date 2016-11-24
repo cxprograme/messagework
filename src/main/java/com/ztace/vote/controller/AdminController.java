@@ -2,6 +2,8 @@ package com.ztace.vote.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +19,7 @@ import com.ztace.vote.service.UserInfoService;
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
-	
+	private static final transient Log log = LogFactory.getLog(AdminController.class);
 	@Autowired
 	private UserInfoService userInfoService;
 	
@@ -52,7 +54,8 @@ public class AdminController {
 	@RequestMapping(value="/saveUser",method=RequestMethod.POST)
 	public AjaxReturn saveUser(UserInfo userInfo){
 		AjaxReturn result=Ajax.fail().setMsg("保存失败");
-		System.err.println(userInfo);
+		//System.err.println(userInfo);
+		log.info("注册用户信息:"+userInfo);
 		if(userInfoService.save(userInfo)>0){
 			result.setOk(true).setMsg("保存成功");
 		}

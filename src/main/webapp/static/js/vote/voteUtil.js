@@ -156,23 +156,20 @@ $(function(){
 										$(".mask").show();
 										$(".mask img").attr("src",data.data);
 										voteFn.hideEncode($(".mask"));
+									}else if(data.errCode=="max"){
+										//投票数量达上限
+										parent.layer.msg(data.msg,{icon:1,time:2000,shade: [0.8, '#393D49']}, function(){
+											parent.layer.close(parent.layer.getFrameIndex(window.name)); //关闭弹窗
+											
+										});
 									}else{
 										//已投票
 										parent.layer.msg(data.msg,{icon:1,time:2000,shade: [0.8, '#393D49']}, function(){
 											parent.layer.close(parent.layer.getFrameIndex(window.name)); //关闭弹窗
 											
 										});
-										
 									}
 								}
-//								else if(data.errCode=="notfollow"){
-//									console.log(data.data);
-//									parent.layer.msg(data.msg,{icon:1,time:1000,shade: [0.8, '#393D49']}, function(){
-//										parent.layer.close(parent.layer.getFrameIndex(window.name)); //关闭弹窗
-//										
-//									});
-//								
-//								}
 							}
 						});
 					},
@@ -197,5 +194,7 @@ $(function(){
 				
 				
 			}
+			
+		
 			
 		})
