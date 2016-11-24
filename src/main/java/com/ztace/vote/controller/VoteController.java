@@ -2,6 +2,9 @@ package com.ztace.vote.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,19 +15,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ztace.message.web.Ajax;
 import com.ztace.message.web.AjaxReturn;
+import com.ztace.vote.entity.AccessToken;
+import com.ztace.vote.entity.EncodeTicket;
 import com.ztace.vote.entity.UserInfo;
 import com.ztace.vote.entity.VoteCount;
 import com.ztace.vote.entity.VoteInfo;
+import com.ztace.vote.entity.WeChatOauth2Token;
 import com.ztace.vote.service.UserInfoService;
 import com.ztace.vote.service.VoteCountService;
 import com.ztace.vote.service.VoteService;
 import com.ztace.vote.util.CheckUtil;
+import com.ztace.vote.util.ReadFileUtil;
+import com.ztace.vote.util.WeChatUtil;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
@@ -46,69 +56,105 @@ public class VoteController {
 
 	@Autowired
 	private VoteCountService voteCountService;
-	/**
-	 * 数据传递接口
-	 * 
-	 * @param request
-	 * @param response
-	 */
-	@RequestMapping("/entry")
-	public void entryWechat(HttpServletRequest request, HttpServletResponse response) {
-		System.out.println("消息传递");
-		String signature = request.getParameter("signature");
-		String timestamp = request.getParameter("timestamp");
-		String nonce = request.getParameter("nonce");
-		String echostr = request.getParameter("echostr");
-
-		PrintWriter out;
-		try {
-			out = response.getWriter();
-			if (CheckUtil.check(signature, timestamp, nonce)) {
-				out.print(echostr);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
+	
 	/**
 	 * 投票初始页面
 	 * 
 	 * @return
 	 */
+	//@RequestMapping("/index")
+	/*public String voteIndex(Model model,@RequestParam("code") String code,HttpServletRequest request) {
+		System.out.println("进入");
+		VoteInfo snsUserInfo=null;
+		try {
+			WeChatOauth2Token wt = WeChatUtil.getOauth2Token(code);
+			// 验证token是否过期
+			WeChatUtil.checkToken(wt.getAccessToken(), wt.getOpenId());
+			// 获取用户信息
+			snsUserInfo = WeChatUtil.getOauth2UserInfo(wt.getAccessToken(), wt.getOpenId());
+			
+			// 将用户openId放入session中
+			request.getSession().setAttribute("openId", snsUserInfo.getOpenid());
+			// 设置要传递的参数
+			request.setAttribute("snsUserInfo", snsUserInfo);
+			System.out.println("用户信息:" + snsUserInfo.toString());
+			VoteInfo voteInfo=voteService.queryVoteInfoByOpenid(snsUserInfo.getOpenid());
+			if(voteInfo==null){
+				// 将用户信息存入数据库
+				voteService.save(snsUserInfo);
+			}
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		JSONObject json = JSONObject.fromObject(snsUserInfo);
+		System.err.println("json:"+json);
+		model.addAttribute("voteInfo", json);
+		return "/vote/index1";
+	}*/
+	
+	
+	/***
+	 * 测试投票
+	 * (这里用一句话描述这个方法的作用)
+	 * 方法名：voteIndex
+	 * 创建人：chenxu 
+	 * 时间：2016年11月21日-下午4:48:15 
+	 * 手机:
+	 * @param model
+	 * @return String
+	 * @exception 
+	 * @since  1.0.0
+	 */
 	@RequestMapping("/index")
 	public String voteIndex(Model model) {
 		System.out.println("进入");
-///*		try {
-//			WeChatOauth2Token wt = WeChatUtil.getOauth2Token(code);
-//			// 验证token是否过期
-//			WeChatUtil.checkToken(wt.getAccessToken(), wt.getOpenId());
-//			// 获取用户信息
-//			VoteInfo snsUserInfo = WeChatUtil.getOauth2UserInfo(wt.getAccessToken(), wt.getOpenId());
-//			
-//			// 将用户openId放入session中
-//			request.getSession().setAttribute("openId", snsUserInfo.getOpenid());
-//			// 设置要传递的参数
-//			request.setAttribute("snsUserInfo", snsUserInfo);
-//			System.out.println("用户信息:" + snsUserInfo.toString());
-//			// 将用户信息存入数据库
-//			// DbUtil.insertUserInfo(snsUserInfo);
-//			voteService.save(snsUserInfo);
-//			
-//		} catch (Exception e) {
-//			// TODO: handle exception
-//			e.printStackTrace();
-//		}*/
 		VoteInfo voteInfo=new VoteInfo();
-		voteInfo.setOpenid("jdksdjskdjskjdjskdskdks");
+		voteInfo.setOpenid("ogERLwGst34lgmhBUlAWaHHq13DY");
 		voteInfo.setNickname("cxxcx");
 		JSONObject json = JSONObject.fromObject(voteInfo);
 		model.addAttribute("voteInfo", json);
-		return "/vote/index";
+		return "/vote/index1";
 	}
 
+	/**
+	 * 初始化数据库
+	 * (这里用一句话描述这个方法的作用)
+	 * 方法名：init
+	 * 创建人：chenxu 
+	 * 时间：2016年11月23日-下午3:01:46 
+	 * 手机: void
+	 * @exception 
+	 * @since  1.0.0
+	 */
+	@RequestMapping("/init")
+	public void init(){
+//		AccessToken accessToken=WeChatUtil.getAccessToken();
+		String access_token="037r9TNB8Uvv5hJD9JWgbNe9M_8vImclfqXqUYWYjQ-rIZmBCiPwipPgXRt4Ck9yj1H6c91is3qhfviaSxKoc1O5TEspMM6pzBAagUU-wktfGWzJdUpapojKpJ40zAsYVFBjAEAMWS";
+		
+		String JsonContext = new ReadFileUtil().ReadFile("/Users/cx/Downloads/fans-openid.json");
+		JSONObject jsonObject=JSONObject.fromObject(JsonContext);
+		JSONObject jsonObject2=JSONObject.fromObject(jsonObject.getString("data"));
+		JSONArray jsonArray=JSONArray.fromObject(jsonObject2.getString("openid"));
+		List<VoteInfo> voteInfos=new ArrayList<>();
+		int size=jsonArray.size();
+		System.err.println(size);
+//		VoteInfo voteInfo=new VoteInfo();
+//		voteInfo.setNickname("Queeny👸🏾");
+		for(int i=0;i<size;i++)
+		{
+			String openid=jsonArray.get(i).toString();
+			VoteInfo voteInfo=WeChatUtil.getUserInfoByopenid(access_token, openid);
+//			VoteInfo voteInfo=new VoteInfo();
+//			voteInfo.setOpenid(jsonArray.get(i).toString());
+			voteInfo.setIsfollow(1);
+			
+			voteInfos.add(voteInfo);
+			}
+		System.err.println(voteInfos);
+		voteService.insertBatch(voteInfos);
+	}
 	/**
 	 * 查询注册用户的信息
 	 */
@@ -128,27 +174,52 @@ public class VoteController {
 	 * 时间：2016年11月19日-下午1:57:36 
 	 * 手机:
 	 * @param id
-	 * @param openid
+	 * @param openid	投票人的openid
 	 * @return AjaxReturn
+	 * @throws UnsupportedEncodingException 
 	 * @exception 
 	 * @since  1.0.0
 	 */
 	@ResponseBody
 	@RequestMapping("/index/poll")
-	public AjaxReturn votePoll(@RequestParam("id") int id,@RequestParam("voterId") String voterId){
+	public AjaxReturn votePoll(@RequestParam("id") int id,@RequestParam("openid") String openid) throws UnsupportedEncodingException{
 		AjaxReturn result=Ajax.fail().setMsg("投票失败");
-		System.out.println("注册用户编号id："+id+"投票者的openid："+voterId);
-		VoteCount voteCount=new VoteCount();
-		voteCount.setUserid(id);
-		voteCount.setOpenid(voterId);
-		//查询是否已经投票
-		VoteCount voteCount2=voteCountService.queryByopenidAnduserid(voteCount);
-		if(voteCount2==null){
-			if(voteCountService.save(voteCount)>0){
-				result.setOk(true).setMsg("Vote Success");
+		
+		VoteInfo voteInfo=voteService.queryVoteInfoByOpenid(openid);
+		int isfollow=voteInfo.getIsfollow();
+		
+		//判断用户是否关注
+		if(isfollow==1){
+			VoteCount voteCount=new VoteCount();
+			voteCount.setUserid(id);
+			voteCount.setOpenid(openid);
+			//查询是否已经投票			
+			VoteCount voteCount2=voteCountService.queryByopenidAnduserid(voteCount);
+			if(voteCount2==null){
+				//已经投票
+				if(voteCountService.save(voteCount)>0){
+					result.setOk(true).setMsg("Vote Success");
+				}
+			}else{
+				result.setOk(false).setMsg("Vote Exits");
 			}
+			
 		}else{
-			result.setOk(true).setMsg("Vote Exits");
+			
+			//获取全局的AccessToken
+			AccessToken accessToken=WeChatUtil.getAccessToken();
+			
+			String accss_token=accessToken.getAccess_token();
+			
+			//创建ticket的请求参数
+			String postJson = "{\"expire_seconds\": 300, \"action_name\": \"QR_SCENE\", \"action_info\": {\"scene\": {\"scene_id\":"+id+"}}}";
+			System.err.println("postJson:"+postJson);
+			EncodeTicket encodeTicket=WeChatUtil.getTicket(accss_token, postJson);
+			
+			String ticket=URLEncoder.encode(encodeTicket.getTicket(),   "utf-8");
+			String imgsrc=WeChatUtil.GET_ENCODE.replace("TICKET", ticket);
+			System.err.println("urlencode"+ticket);
+			result.setOk(false).setErrCode("notfollow").setData(imgsrc);
 		}
 		
 		return result;

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
+<title>投票首页</title>
+<link rel="stylesheet" type="text/css"
+	href="../static/css/vote/style1.css">
+<link rel="stylesheet" type="text/css"
+	href="../static/css/vote/dropload.css">
+</head>
+<style type="text/css">
+		.coming{
+		display: flex;
+		flex-flow: row wrap;
+	}
+	.autophoto{
+		/*width:400px;
+		height:300px;*/
+		border:1px solid #eee;
+		margin:0 auto;
+	}
+</style>
+<body data-vote=${voteInfo}>
+	<div class="content">
+		<div class="header">
+			<div class="rule">
+				<a href="/vote/rule"> <span>活动规则</span>
+				</a>
+			</div>
+			<div class="title tada">
+				<img src="../static/images/vote/title.png" alt="">
+			</div>
+		</div>
+		<div class="lists">
+			<div class="coming-box">
+				<ul class="coming">
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="mask">
+		<div class="submit_info">
+			<img alt="" src="../static/images/vote/noimage.gif">
+		</div>
+
+	</div>
+</body>
+<script src="../static/js/common/jquery-1.11.3.min.js"></script>
+<script src="../static/js/vote/dropload.js"></script>
+ 
+<script type="text/javascript" src="../static/plugins/layer/layer.js"></script>
+<script type="text/javascript" src="../static/plugins/layer/layer.config.js"></script>
+
+<script src="../static/js/vote/voteUtil.js"></script>
+</html>

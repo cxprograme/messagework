@@ -1,5 +1,15 @@
 package com.ztace.vote.entity;
 
+
+/**
+ * 文本对象的实体类
+ * 
+ * TextMessage
+ * 创建人:chenxu 
+ * 时间：2016年11月22日-上午9:22:45 
+ * @version 1.0.0
+ *
+ */
 public class TextMessage extends BaseMessage {
 
 

@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts2.json.JSONException;
 import org.apache.struts2.json.JSONUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,62 +33,23 @@ import org.springframework.web.multipart.MultipartFile;
 @Controller
 @RequestMapping("/upload")
 public class UploadController {
+	
+	@Value("${uploadPath}")
+	private String uploadPath;
+	
 	@ResponseBody
 	@RequestMapping(value="/file",method=RequestMethod.POST)
 	public String cxupload(@RequestParam("doc") MultipartFile file,HttpServletRequest request,
 			HttpServletResponse response)throws IllegalStateException,IOException,JSONException{
-		/*String oldFile=request.getParameter("oldName");
-		String oldName=null;
-		String ext=null;
-		String newName=null;
-		String fpath=null;
-		File targetFile=null;
-		String url=null;*/
-	/*	if(TmStringUtils.isNotEmpty(oldFile)){
-			oldName=file.getOriginalFilename();
-			String rootPath=request.getServletContext().getRealPath("/");
-			ext=oldFile.substring(oldFile.lastIndexOf(".")+1);
-			url=oldFile;
-			//获取父目录
-			targetFile=new File(rootPath,oldFile);
-			File pfile=new File(targetFile.getPath());
-			//如果父目录不存在，则创建
-			if(!pfile.exists())pfile.mkdirs();
-		}else{
-			
-			oldName=file.getOriginalFilename();
-			ext=oldName.substring(oldName.lastIndexOf(".")+1);
-			
-			String directory=request.getParameter("dir");
-			if(TmStringUtils.isEmpty(directory))directory="blog";
-			
-			//获取日期路径
-			String ymd=new SimpleDateFormat("yyyy/MM/dd").format(new Date());
-			fpath="resource/"+directory+"/"+ymd;
-			
-			//获取服务器路径
-			String dirPath=request.getServletContext().getRealPath(fpath);
-			
-			//图片重命名
-			newName=UUID.randomUUID().toString()+"."+ext;
-			//获取图片上传的具体路径
-			targetFile=new File(dirPath,newName);
-			//获取父目录
-			File pfile=new File(targetFile.getPath());
-			//如果父目录不存在，则创建
-			if(!pfile.exists())pfile.mkdirs();
-			url=fpath+"/"+newName;
-		}
-		
-		*/
 		
 		String oldname=file.getOriginalFilename();
 		String ext=oldname.substring(oldname.lastIndexOf(".")+1);
 		//设置日期路径
 		String ymd=new SimpleDateFormat("yyyy/MM/dd").format(new Date());
-		String fpath="resources/"+ymd;
+//		String fpath="/Developer/web/resources/"+ymd;
+		String fpath=uploadPath+ymd;
 		//获取服务器的路径
-		String dirPath=request.getSession().getServletContext().getRealPath(fpath);
+		String dirPath=fpath;//request.getSession().getServletContext().getRealPath(fpath);
 		//对图片重新命名
 		String newName=UUID.randomUUID().toString()+"."+ext;
 		//获得上传图片的具体路径
@@ -103,7 +65,7 @@ public class UploadController {
 		map.put("newName",newName);	//文件的新名称
 		map.put("ext", ext);		//文件的后缀
 		map.put("size", file.getSize());// 文件的真实大小
-		map.put("url",fpath+"/"+newName);	//获取文件的具体的服务期目录
+		map.put("url","/resources/"+ymd+"/"+newName);	//获取文件的具体的服务期目录
 		
 		return JSONUtil.serialize(map) ;
 		

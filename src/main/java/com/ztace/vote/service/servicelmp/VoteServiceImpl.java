@@ -37,4 +37,22 @@ public class VoteServiceImpl implements VoteService{
 		return voteMapper.queryVoteInfoByUserid(userid);
 	}
 
+	@Override
+	public VoteInfo queryVoteInfoByOpenid(String openid) {
+		// TODO Auto-generated method stub
+		return voteMapper.queryVoteInfoByOpenid(openid);
+	}
+
+	@Override
+	public int updateVoteInfoByOpenid(VoteInfo voteInfo) {
+		// TODO Auto-generated method stub
+		return voteMapper.updateVoteInfoByOpenid(voteInfo);
+	}
+
+	@Override
+	public int insertBatch(List<VoteInfo> voteInfos) {
+		// TODO Auto-generated method stub
+		return voteMapper.insertBatch(voteInfos);
+	}
+
 }

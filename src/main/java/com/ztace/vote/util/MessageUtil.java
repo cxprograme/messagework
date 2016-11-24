@@ -37,11 +37,13 @@ public class MessageUtil {
 	public static final String MESSAGE_SHORTVIDEO="shortvideo";
 	public static final String MESSAGE_LOCATION="location";
 	public static final String MESSAGE_LINK="link";
-	public static final String MESSAGE_EVENT="event";
-	public static final String MESSAGE_SUBSCRIBE="subscribe";
+	public static final String MESSAGE_EVENT="event";				//事件
+	public static final String MESSAGE_SUBSCRIBE="subscribe";		//关注
+	public static final String MESSAGE_UNSUBSCRIBE = "unsubscribe";	//取消关注
 	public static final String MESSAGE_SCAN="SCAN";
 	public static final String MESSAGE_CLICK="CLICK";
 	public static final String MESSAGE_VIEW="VIEW";
+	public static final String MESSAGE_SCANCODE= "scancode_push";
 	
 	/**
 	 * 将xml转换为集合数据类型

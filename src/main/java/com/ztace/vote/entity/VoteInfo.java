@@ -1,6 +1,17 @@
 package com.ztace.vote.entity;
 
+
+/**
+ * 
+ * 已关注和授权用户的实体类
+ * VoteInfo
+ * 创建人:chenxu 
+ * 时间：2016年11月21日-下午2:22:57 
+ * @version 1.0.0
+ *
+ */
 public class VoteInfo {
+	private int id;
 	private int subscribe;
 	private String openid;
 	private String nickname;
@@ -16,13 +27,17 @@ public class VoteInfo {
 	
 	private String unionid;
 	
+
+	private int deleted;		//逻辑删除判断标志
+	
+	private int isfollow;	//关注判断标志  0 未关注  1 关注
+	
 	public int getDeleted() {
 		return deleted;
 	}
 	public void setDeleted(int deleted) {
 		this.deleted = deleted;
 	}
-	private int deleted;
 	public int getSubscribe() {
 		return subscribe;
 	}
@@ -97,10 +112,22 @@ public class VoteInfo {
 	}
 	@Override
 	public String toString() {
-		return "UserInfo [subscribe=" + subscribe + ", openid=" + openid + ", nickname=" + nickname + ", sex=" + sex
+		return "VoteInfo [subscribe=" + subscribe + ", openid=" + openid + ", nickname=" + nickname + ", sex=" + sex
 				+ ", city=" + city + ", country=" + country + ", province=" + province + ", language=" + language
 				+ ", headimgurl=" + headimgurl + ", subscribe_time=" + subscribe_time + ", privilege=" + privilege
-				+ ", unionid=" + unionid + "]";
+				+ ", unionid=" + unionid + ", deleted=" + deleted + ", isfollow=" + isfollow + "]";
+	}
+	public int getIsfollow() {
+		return isfollow;
+	}
+	public void setIsfollow(int isfollow) {
+		this.isfollow = isfollow;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 }

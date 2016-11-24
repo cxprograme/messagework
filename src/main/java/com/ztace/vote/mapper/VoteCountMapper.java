@@ -1,6 +1,7 @@
 package com.ztace.vote.mapper;
 
 import com.ztace.vote.entity.VoteCount;
+import com.ztace.vote.entity.VoteInfo;
 
 /**
  * 
@@ -54,4 +55,7 @@ public interface VoteCountMapper {
 	 * @since  1.0.0
 	 */
 	int countVoteByUserId(int userid);
+	
+	
+
 }

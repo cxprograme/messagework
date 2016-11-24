@@ -31,4 +31,47 @@ public interface VoteService {
 	 * @since  1.0.0
 	 */
 	List<VoteInfo> queryVoteInfoByUserid(int userid);
+	
+	/**
+	 * 根据openid 查询投票人的信息
+	 * (这里用一句话描述这个方法的作用)
+	 * 方法名：queryVoteInfoByOpenid
+	 * 创建人：chenxu 
+	 * 时间：2016年11月21日-下午2:35:24 
+	 * 手机:
+	 * @param openid
+	 * @return VoteInfo
+	 * @exception 
+	 * @since  1.0.0
+	 */
+	VoteInfo queryVoteInfoByOpenid(String openid);
+	
+	/**
+	 * 更新信息通过openid
+	 * (这里用一句话描述这个方法的作用)
+	 * 方法名：updateVoteInfoByOpenid
+	 * 创建人：chenxu 
+	 * 时间：2016年11月22日-上午10:39:39 
+	 * 手机:
+	 * @param voteInfo
+	 * @return int
+	 * @exception 
+	 * @since  1.0.0
+	 */
+	int updateVoteInfoByOpenid(VoteInfo voteInfo);
+	
+	
+	/**
+	 * 批量新增用户信息
+	 * (这里用一句话描述这个方法的作用)
+	 * 方法名：insertBatch
+	 * 创建人：chenxu 
+	 * 时间：2016年11月23日-下午3:26:34 
+	 * 手机:
+	 * @return int
+	 * @exception 
+	 * @since  1.0.0
+	 */
+	int insertBatch(List<VoteInfo> voteInfos);
+	
 }

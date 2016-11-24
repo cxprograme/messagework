@@ -7,6 +7,11 @@ $(function(){
 			limit = 10,
 			offset = 0;
 			var voteFn={
+					init:function(){
+						$("img").on("error",function(){
+							$(this).attr("src","../static/images/vote/noimage.gif");	
+						})
+					},
 					/**
 					 * [将数据存储在本地]
 					 * @param {String} key [键值]
@@ -41,30 +46,29 @@ $(function(){
 					userStr: function(objs) {
 						var str = '';
 						for(var i=0; i<objs.length; i++) {
-							str += '<li>'        
-				                + '<div class="head">'
-				                + '<a href="/vote/detail?userid=' + objs[i].id + '">'
-				                + '<img src="' + objs[i].headimgurl + '" alt="">'
-				                + '</a>'
-				                + '</div>'
-				                + '<div class="up">'
-				                + '<div class="vote">'
-				                + '<span>' + objs[i].votenum + '票</span>'
-				                + '</div>'
-				                + '<div class="btn" id=' + objs[i].id + '>'
-				                + '投TA一票'
-				                + '</div>'
-				                + '</div>'
-				                + '<div class="descr">'
-				                + '<a href="/vote/detail/' + objs[i].id + '">'
-				                + '<div>'
-				                + '<span>' + objs[i].nickname + '</span>'
-				                + '<span>|</span>'
-				                + '<span>编号#' + objs[i].id + '</span>'
-				                + '</div>'
-				                + '</a>'
-				                + '</div>'
-				               	+ '</li>';
+							str+="<li>"+
+									"<div class='head'>"+
+									"<a href='/vote/detail?userid=" + objs[i].id + "'> <img src='" + objs[i].headimgurl + "' alt=''></a>"+
+									"</div>"+
+									"<div class='descr'>"+
+									"<a href='/vote/detail'>"+
+									"<div>"+
+									"<span>" + objs[i].nickname + "</span>"+
+									"</div>"+
+									"<p>编号#" + objs[i].id + "</p>"+
+									"</a>"+
+									"</div>"+
+									"<div class='autophoto'>"+
+									"<img src='../"+objs[i].photo +"' alt=''>"+
+									"</div>"+
+									"<div class='up'>"+
+									"<div class='vote'>"+
+									"<span class='vm"+objs[i].id+"' data-userid='"+objs[i].id+"'>"+ objs[i].votenum +"</span>"+
+									"<span>票</span>"+
+									"</div>"+
+									"<div class='btn'  id='"+ objs[i].id + "'>投TA一票</div>"+
+									"</div>"+
+									"</li>";
 						}
 						return str;
 					},
@@ -115,6 +119,12 @@ $(function(){
 							
 						});
 					},
+					
+					hideEncode:function(obj){
+						$(".mask").click(function(){
+							obj.hide();
+						});
+					},
 					/**
 					 * [发起投票请求]
 					 * @param  {String} id      [被投票者id号]
@@ -123,29 +133,52 @@ $(function(){
 					 */
 					voteRequest: function(id, voterId, _this) {
 						$.ajax({
-							url: '/vote/index/poll?id=' + id + '&voterId=' + voterId,
+							url: '/vote/index/poll?id=' + id + '&openid=' + voterId,
 							type: 'GET',
 							success: function(data) {
 								if(data.ok){
-									parent.layer.msg(data.msg,{icon:1,time:2000,shade: [0.8, '#393D49']}, function(){
+									//未投票
+									parent.layer.msg(data.msg,{icon:1,time:1000,shade: [0.8, '#393D49']}, function(){
 										parent.layer.close(parent.layer.getFrameIndex(window.name)); //关闭弹窗
-								
+										
 									});
+									var val=$(".vm"+id).text();
+									console.log(val);
+									val++;
+									console.log(val);
+									$(".vm"+id).text(val);
+								}else if(!data.ok){
+									console.log(data);
+									//未关注
+									if(data.errCode=="notfollow"){
+										console.log(111);
+										console.log(data.data);
+										$(".mask").show();
+										$(".mask img").attr("src",data.data);
+										voteFn.hideEncode($(".mask"));
+									}else{
+										//已投票
+										parent.layer.msg(data.msg,{icon:1,time:2000,shade: [0.8, '#393D49']}, function(){
+											parent.layer.close(parent.layer.getFrameIndex(window.name)); //关闭弹窗
+											
+										});
+										
+									}
 								}
-								/* data = JSON.parse(data);
-								if(data.errno === 0) {
-									var voteNum = $(_this).siblings('.vote').children('span').html();
-									var reg = /(\d*)/;
-									voteNum = reg.exec(voteNum)[1];
-									$(_this).siblings('.vote').children('span').html(++voteNum + '票');
-									$(_this).siblings('.vote').addClass('bounceIn');
-								}else {
-									alert(data.msg);
-								} */
+//								else if(data.errCode=="notfollow"){
+//									console.log(data.data);
+//									parent.layer.msg(data.msg,{icon:1,time:1000,shade: [0.8, '#393D49']}, function(){
+//										parent.layer.close(parent.layer.getFrameIndex(window.name)); //关闭弹窗
+//										
+//									});
+//								
+//								}
 							}
 						});
 					},
 			}
+			
+			
 			if(indexReg.test(url)){
 				var voteInfo=$("body").data("vote");
 				voteFn.setStorage("voteInfo", voteInfo);
@@ -158,6 +191,7 @@ $(function(){
 					success: function(data) {
 						$('.coming').append(voteFn.userStr(data));
 						voteFn.userPoll();
+						voteFn.init();
 					}
 				});
 				

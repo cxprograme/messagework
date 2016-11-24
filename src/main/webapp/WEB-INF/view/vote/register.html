@@ -92,6 +92,8 @@
 </body>
 <script src="../static/js/common/jquery-1.11.3.min.js"></script>
 <script src="../static/js/vote/cx_upload.js"></script>
+<script type="text/javascript" src="../static/plugins/layer/layer.js"></script>
+<script type="text/javascript" src="../static/plugins/layer/layer.config.js"></script>
 <script type="text/javascript">
 		var cx_upload={
 				init:function(){
@@ -111,14 +113,19 @@
 							photo:photo
 					}
 					
-					alert(JSON.stringify(params));
 					var method="saveUser";
 					$.ajax({
 						type:'post',
 						url:"/admin/"+method,
 						data:params,
 						success:function(data){
-							alert(data.msg);
+							if(data.ok){
+							parent.layer.msg(data.msg,{icon:1,time:2000,shade: [0.8, '#393D49']}, function(){
+								parent.layer.close(parent.layer.getFrameIndex(window.name)); //关闭弹窗
+								
+							});
+								
+							}
 						}
 					});
 					
@@ -127,7 +134,7 @@
 		cx_upload.init();
 		
 		function tz_uploadsuccess(to,jdata){
-			$("#img").data("img",jdata.url).attr("src","/"+jdata.url);
+			$("#img").data("img",jdata.url).attr("src",jdata.url);
 		}
 </script>
 </html>
